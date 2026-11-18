@@ -176,7 +176,6 @@ p{margin:0}
 <body>
 <div class="sky" aria-hidden="true"><canvas id="sky"></canvas></div>
 
-<button class="mus off" type="button" id="mus" aria-label="Activar música" aria-pressed="false"><span class="eq"><i></i><i></i><i></i></span></button>
 
 <main class="stage" id="stage">
 
@@ -218,7 +217,7 @@ p{margin:0}
   <section class="scene s-last" data-name="con-carino" aria-label="Con cariño">
     <div class="text">
       <h2 class="rv" style="--d:.5">Con cariño</h2>
-      <p class="lede rv" style="--d:.9">Te ofrezco mis poemas, mis cartas, mi boca que casi nunca calla, mis ojos que siempre lloran, Te ofrezco nada pero<span class="hl">Ojala a ti te parezca todo ₍ᐢ..ᐢ₎♡</span></p>
+      <p class="lede rv" style="--d:.9">Te ofrezco mis poemas, mis cartas, mi boca que casi nunca calla, mis ojos que siempre lloran, Te ofrezco nada pero  <span class="hl">Ojala a ti te parezca todo ₍ᐢ..ᐢ₎♡</span> </p>
       <p class="hand rv" style="--d:1.5">Joel</p>
       <button class="btn rv" style="--d:1.8" type="button" id="restart">Volver a empezar</button>
     </div>
@@ -504,7 +503,7 @@ p{margin:0}
 
   /* ---------- música (un solo audio; el easter egg lo reutiliza) ---------- */
   var audio=null,actx=null,an=null,gain=null,abuf=null,muted=false;
-  var mus=document.getElementById('mus'),eggMute=document.getElementById('eggMute');
+  var eggMute=document.getElementById('eggMute');
   function initAudio(){
     if(audio)return;
     var bin=atob(document.getElementById('song').textContent.trim()),u=new Uint8Array(bin.length);
@@ -532,13 +531,12 @@ p{margin:0}
   }
   function syncMusUI(){
     var playing=!!audio&&!audio.paused&&!muted;
-    [mus,eggMute].forEach(function(b){
+    [eggMute].forEach(function(b){
       b.classList.toggle('on',playing);b.classList.toggle('off',!playing);
       b.setAttribute('aria-pressed',playing?'true':'false');
       b.setAttribute('aria-label',playing?'Silenciar música':'Activar música');
     });
   }
-  mus.addEventListener('click',toggleMusic);
   eggMute.addEventListener('click',toggleMusic);
 
   /* ---------- easter egg ---------- */
@@ -547,12 +545,13 @@ p{margin:0}
     if(eggOpen)return;eggOpen=true;egg.hidden=false;
     ifr=document.createElement('iframe');ifr.title='Gato con audífonos y luna';
     ifr.setAttribute('sandbox','allow-scripts');ifr.srcdoc=CAT;eggFrame.appendChild(ifr);
-    if(!audio||audio.paused)startMusic();else syncMusUI();
+    startMusic();   /* la canción solo suena aquí, desde el principio */
     eggClose.focus();
   }
   function closeEgg(){
     if(!eggOpen)return;eggOpen=false;egg.hidden=true;
     if(ifr){ifr.remove();ifr=null}
+    if(audio){audio.pause();audio.currentTime=0}syncMusUI();
   }
   eggClose.addEventListener('click',closeEgg);
   function feedCat(){
@@ -600,8 +599,8 @@ p{margin:0}
     return m?parseInt(m[1],10)-1:0;
   }
   prev.addEventListener('click',function(){go(cur-1)});
-  next.addEventListener('click',function(){if(!audio)startMusic();go(cur+1)});
-  document.getElementById('open').addEventListener('click',function(){if(!audio)startMusic();go(1)});
+  next.addEventListener('click',function(){go(cur+1)});
+  document.getElementById('open').addEventListener('click',function(){go(1)});
   document.getElementById('restart').addEventListener('click',function(){go(0)});
   document.addEventListener('keydown',function(e){
     if(eggOpen){if(e.key==='Escape')closeEgg();return}
@@ -643,4 +642,3 @@ p{margin:0}
 </script>
 </body>
 </html>
-
